@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(PROJECT_NAME AsioServer)
+set(PROJECT_NAME async_server)
 project(${PROJECT_NAME} C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -19,11 +19,13 @@ add_definitions(-DASIO_STANDALONE)
 # Project files, packages, libraries and so on
 ##########################################################
 
-file(GLOB SOURCES source/*.cpp)
+#file(GLOB SOURCES source/*.cpp)
 
-add_executable(${PROJECT_NAME} source/server.cpp ${NETWORK_SOURCES})
+add_executable(asio_server source/server_entry_point.cpp)
+add_executable(asio_client source/client_entry_point.cpp)
 
 ########
 # Asio #
 ########
-include_directories(${PROJECT_NAME} vendor/asio/asio/include)
+include_directories(asio_server vendor/asio/asio/include)
+include_directories(asio_client vendor/asio/asio/include)
