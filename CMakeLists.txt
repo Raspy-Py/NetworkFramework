@@ -21,11 +21,11 @@ add_definitions(-DASIO_STANDALONE)
 
 #file(GLOB SOURCES source/*.cpp)
 
+include_directories(vendor/asio/asio/include)
+
 add_executable(asio_server source/server_entry_point.cpp)
 add_executable(asio_client source/client_entry_point.cpp)
 
 ########
 # Asio #
 ########
-include_directories(asio_server vendor/asio/asio/include)
-include_directories(asio_client vendor/asio/asio/include)

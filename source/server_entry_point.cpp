@@ -3,18 +3,7 @@
 #include <string>
 #include <asio.hpp>
 
-#include <chrono>
-#include <thread>
-
-using asio::ip::udp;
-
-void broadcast_presence(asio::io_context& io_context, unsigned short port, const std::string& message) 
-{
-    udp::socket socket(io_context, udp::endpoint(udp::v4(), 0));
-    socket.set_option(asio::socket_base::broadcast(true));
-    udp::endpoint broadcast_endpoint(asio::ip::address_v4::broadcast(), port);
-    socket.async_send_to(asio::buffer(message), broadcast_endpoint, [](std::error_code /*ec*/, std::size_t /*bytes_sent*/){});
-}
+#include "network/broadcaster.h"
 
 int main(int argc, char* argv[])
 {
@@ -29,13 +18,14 @@ int main(int argc, char* argv[])
   unsigned short port;
   port_stream >> port;
 
-  asio::io_context io_context;
-  std::string message = "GameRoomAvailable:" + std::to_string(port);
-  for (int i = 0; i < 10; i++)
-     broadcast_presence(io_context, port, message);
-  std::this_thread::sleep_for(std::chrono::seconds(5));
+  try {
+	Broadcaster broadcaster(port);
+	broadcaster.Start("Yo sniffer, what's up dude?");
+	std::this_thread::sleep_for(std::chrono::seconds(5));
+  } catch (const std::exception& e){
+	std::cerr << e.what() << std::endl;
+  }
 
-  io_context.run();
 
   return 0;
 }

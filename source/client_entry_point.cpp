@@ -1,44 +1,38 @@
 #include <asio.hpp>
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <atomic>
 
-using asio::ip::udp;
+#include "network/sniffer.h"
 
-void start_receive(udp::socket& socket, std::array<char, 1024>& recv_buffer, udp::endpoint& sender_endpoint) {
-    socket.async_receive_from(
-        asio::buffer(recv_buffer), sender_endpoint,
-        [&](const std::error_code& error, std::size_t bytes_recvd) {
-            if (!error && bytes_recvd > 0) {
-                std::cout << "Received message: " << std::string(recv_buffer.data(), bytes_recvd)
-                          << " from " << sender_endpoint.address().to_string()
-                          << ":" << sender_endpoint.port() << std::endl;
-                
-                // You can now use sender_endpoint to reply or to store the sender's address and port
+int main(int argc, char* argv[])
+{
+  if (argc != 2)
+  {
+	  std::cerr << "Usage: asio_client <port>\n";
+	  return -1;
+  }
 
-                // Optionally, continue to listen for more messages
-                start_receive(socket, recv_buffer, sender_endpoint);
-            } else {
-                // Handle error or no bytes received
-                std::cerr << "Receive failed: " << error.message() << std::endl;
-                // Optionally, continue to listen for more messages even in case of error
-                start_receive(socket, recv_buffer, sender_endpoint);
-            }
-        });
-}
-
-int main() {
-    try {
-        asio::io_context io_context;
-        
-        udp::socket socket(io_context, udp::endpoint(udp::v4(), 8080)); // Listening on a random available port
-        std::array<char, 1024> recv_buffer;
-        udp::endpoint sender_endpoint;
-        
-        start_receive(socket, recv_buffer, sender_endpoint);
-        
-        io_context.run();
-    } catch (std::exception& e) {
-        std::cerr << "Exception: " << e.what() << "\n";
+  std::stringstream port_stream;
+  port_stream << argv[1];
+  unsigned short port;
+  port_stream >> port;
+  try{
+    std::atomic_bool finished = false;
+    Sniffer sniffer(port);
+    sniffer.Start([&](const std::string& message){
+        std::cout << "Received: " << message << std::endl;
+        finished = true;
+    });
+    
+    while (!finished)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+  } catch (const std::exception& e){
+  	std::cerr << e.what() << std::endl;
+  }
 
-    return 0;
+  return 0;
 }
