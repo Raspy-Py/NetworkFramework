@@ -1,6 +1,7 @@
 #include <exception>
 #include "network/common.h"
 #include "network/udp_client.h"
+#include "network/sniffer.h"
 
 #include <thread>
 #include <chrono>
