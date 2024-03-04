@@ -22,7 +22,7 @@ class CustomClient : public UDPClient<GameEventType>{
   }
 
   void OnReceive(std::shared_ptr<Message<GameEventType>> msg) override{
-    std::cout << "[CLIENT] Server responded." << std::endl;
+    std::cout << "[CLIENT] Server responded to the greetings. Shutting down..." << std::endl;
     finished = true;
   }
 };
@@ -37,14 +37,15 @@ int main(int argc, char** argv)
         if (auto pos = msg.find(':'); pos != std::string::npos) {
             std::string host = msg.substr(0, pos);
             std::string port = msg.substr(pos + 1);
-
+            std::cout << "[CLIENT] Found server at: " << host << ":" << port << std::endl;
+            std::cout << "[CLIENT] Sending greetings..." << std::endl;
             client.Connect(host, port);
             Message<GameEventType> msg{};
             msg.header.id = GameEventType::Default;
             msg << 42.0f;
             client.Send(msg);
         }else{
-            std::cerr << "Sniffer sniffed some bullshit: " << msg << std::endl;
+            std::cerr << "[CLIENT] Error: sniffer sniffed some bullshit: " << msg << std::endl;
         }
     });
 

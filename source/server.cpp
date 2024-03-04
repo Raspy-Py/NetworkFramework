@@ -43,7 +43,7 @@ class CustomServer : public UDPServer<GameEventType>{
 
   void OnReceive(Packet<GameEventType> packet) override{
     auto endp = packet.endpoint;
-    std::cout << "[SERVER] was detected by: " << endp.address().to_string()
+    std::cout << "[SERVER] Received greetings from: " << endp.address().to_string()
               << ":" << endp.port() << std::endl;
     
   SendToAllExcept({});
