@@ -5,7 +5,6 @@
 #include <asio.hpp>
 
 #include "common.h"
-#include "network/sniffer.h"
 #include "thread_safe_queue.h"
 
 template <typename T>
