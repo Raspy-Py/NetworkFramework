@@ -11,8 +11,8 @@ class Broadcaster {
  public:
   Broadcaster(uint16_t broadcast_port)
       : io_context_(),
-      socket_(io_context_, udp::endpoint(udp::v4(), 0)),
-      endpoint_(asio::ip::address_v4::broadcast(), broadcast_port) {
+        socket_(io_context_, udp::endpoint(udp::v4(), 0)),
+        endpoint_(asio::ip::address_v4::broadcast(), broadcast_port) {
     socket_.set_option(asio::socket_base::broadcast(true));
   }
 
@@ -20,7 +20,7 @@ class Broadcaster {
     Stop();
   }
 
-  void Start(const std::string& message){
+  void Start(const std::string& message, std::function<void(void)>&& callback = []{}){
     if (message != "" && message.size() > kMaxMessageSize) {
       std::cerr << "Broadcaster error: message size should be (0, " << kMaxMessageSize << "]. " << std::endl;
       return;
@@ -44,6 +44,7 @@ class Broadcaster {
       [&](asio::error_code ec, size_t bytes_sent){
         if (!ec){
           StartSend();
+          callback_();
         }else{
           std::cerr << "Broadcaster error: failed to send message." << std::endl;
         }
@@ -57,7 +58,7 @@ class Broadcaster {
 
   udp::socket socket_;
   udp::endpoint endpoint_;
-
+  std::function<void(void)> callback_ = []{};
 
   // Should be the same as Sniffer's buffer size
   static constexpr size_t kMaxMessageSize = 128;

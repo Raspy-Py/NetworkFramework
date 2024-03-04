@@ -23,8 +23,8 @@ add_definitions(-DASIO_STANDALONE)
 
 include_directories(vendor/asio/asio/include)
 
-add_executable(asio_server source/server_entry_point.cpp)
-add_executable(asio_client source/client_entry_point.cpp)
+add_executable(asio_server source/server.cpp)
+add_executable(asio_client source/client.cpp)
 
 ########
 # Asio #
