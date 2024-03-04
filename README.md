@@ -33,4 +33,4 @@ To test, run the 'server' and 'client' either in different processes on the same
 ```bash
 ./server <port>
 ```
-<mark>port - arbitrary number between 1024 and 65513</mark>
+<mark>port - arbitrary number between 1024 and 65536</mark>
